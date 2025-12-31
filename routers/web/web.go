@@ -32,6 +32,7 @@ import (
 	"code.gitea.io/gitea/routers/web/feed"
 	"code.gitea.io/gitea/routers/web/healthcheck"
 	"code.gitea.io/gitea/routers/web/misc"
+	gitvm_http "code.gitea.io/gitea/modules/gitvm/http"
 	"code.gitea.io/gitea/routers/web/org"
 	org_setting "code.gitea.io/gitea/routers/web/org/setting"
 	"code.gitea.io/gitea/routers/web/repo"
@@ -268,6 +269,14 @@ func Routes() *web.Router {
 	routes.Methods("GET,HEAD", "/robots.txt", append(mid, misc.RobotsTxt)...)
 	routes.Get("/ssh_info", misc.SSHInfo)
 	routes.Get("/api/healthz", healthcheck.Check)
+
+	// GitVM proof spine endpoints
+	if setting.GitVM.Enabled {
+		routes.Get("/gitvm/root", gitvm_http.GetRoot)
+		routes.Get("/gitvm/root.txt", gitvm_http.GetRootPlainText)
+		routes.Get("/gitvm/receipts", gitvm_http.GetReceipts)
+		routes.Get("/gitvm/receipts.ndjson", gitvm_http.GetReceiptsNDJSON)
+	}
 
 	mid = append(mid, common.MustInitSessioner(), context.Contexter())
 
